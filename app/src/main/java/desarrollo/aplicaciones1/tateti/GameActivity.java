@@ -107,18 +107,18 @@ public class GameActivity extends AppCompatActivity {
         playerTurn = random.nextBoolean();
 
         if (playerTurn) {
-            tvStatus.setText("Arranca " + playerName);
+            tvStatus.setText("Arranca " + playerName + " con " + playerSymbol);
         } else {
-            tvStatus.setText("Arranca la máquina");
+            tvStatus.setText("Arranca la máquina con " + aiSymbol);
             tvStatus.post(() -> {
                 if (gameOver) return;
 
-                aiTurn();
+                aiTurnWithDelay();
 
-                if (!checkGameEnd()) {
-                    playerTurn = true;
-                    tvStatus.setText("Tu turno");
-                }
+//                if (!checkGameEnd()) {
+//                    playerTurn = true;
+//                    tvStatus.setText("Tu turno");
+//                }
             });
         }
     }
@@ -134,14 +134,14 @@ public class GameActivity extends AppCompatActivity {
         }
 
         playerTurn = false;
-        tvStatus.setText("Turno de la máquina");
+        tvStatus.setText("Turno de la máquina con " + aiSymbol);
 
-        aiTurn();
+        aiTurnWithDelay();
 
-        if (!checkGameEnd()) {
-            playerTurn = true;
-            tvStatus.setText("Tu turno");
-        }
+//        if (!checkGameEnd()) {
+//            playerTurn = true;
+//            tvStatus.setText("Tu turno");
+//        }
     }
 
     private void makeMove(int index, char symbol) {
@@ -162,6 +162,20 @@ public class GameActivity extends AppCompatActivity {
         if (move != -1) {
             makeMove(move, aiSymbol);
         }
+    }
+
+    private void aiTurnWithDelay(){
+        tvStatus.postDelayed(() -> {
+            if (gameOver) return;
+
+            aiTurn();
+
+            if (!checkGameEnd()){
+                playerTurn = true;
+                tvStatus.setText("Tu turno con " + playerSymbol);
+            }
+
+        },1000);
     }
 
     private int findRandomMove() {
