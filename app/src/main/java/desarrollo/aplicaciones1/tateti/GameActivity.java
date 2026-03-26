@@ -1,9 +1,11 @@
 package desarrollo.aplicaciones1.tateti;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -152,15 +154,33 @@ public class GameActivity extends AppCompatActivity {
 
     private void aiTurn() {
         int move;
+        int bestMove;
+        boolean aiMistake = false;
 
         if (difficulty == MainActivity.DIFFICULTY_EASY) {
             move = findRandomMove();
         } else {
-            move = findBestMove();
+            int variation = random.nextInt(100);
+            if (variation >= 10){
+                move = findBestMove();}
+            else{
+                bestMove = findBestMove();
+                move = findRandomMove();
+                if (countAvailableMoves() > 1){
+                    while (move == bestMove) {
+                        move = findRandomMove();
+                    }
+                    aiMistake = true;
+                }
+            }
         }
 
         if (move != -1) {
             makeMove(move, aiSymbol);
+        }
+
+        if (aiMistake) {
+            Toast.makeText(this, "La máquina parece haberse confundido 🤖, ¡Aprovechalo!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -176,6 +196,14 @@ public class GameActivity extends AppCompatActivity {
             }
 
         },1000);
+    }
+
+    private int countAvailableMoves() {
+        int count = 0;
+        for (char c : board) {
+            if (c == ' ') count++;
+        }
+        return count;
     }
 
     private int findRandomMove() {
