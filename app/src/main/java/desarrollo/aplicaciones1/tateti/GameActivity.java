@@ -34,6 +34,8 @@ public class GameActivity extends AppCompatActivity {
 
     private int difficulty = MainActivity.DIFFICULTY_HARD;
 
+    private int mistakeProbability = 25;
+
     private final Random random = new Random();
 
     @Override
@@ -76,8 +78,13 @@ public class GameActivity extends AppCompatActivity {
 
         difficulty = intent.getIntExtra(MainActivity.EXTRA_DIFFICULTY, MainActivity.DIFFICULTY_HARD);
 
+        mistakeProbability = intent.getIntExtra(MainActivity.EXTRA_MISTAKE_PROB, 25);
+
         String difficultyText = (difficulty == MainActivity.DIFFICULTY_EASY) ? "Fácil" : "Difícil";
-        tvInfo.setText(playerName + " juega con " + playerSymbol + " | Máquina: " + difficultyText);
+
+        tvInfo.setText(playerName + " juega con " + playerSymbol +
+                " | Máquina: " + difficultyText +
+                (difficulty == MainActivity.DIFFICULTY_HARD ? " (" + mistakeProbability + "% error)" : ""));
     }
 
     private void bindBoardButtons() {
@@ -161,7 +168,7 @@ public class GameActivity extends AppCompatActivity {
             move = findRandomMove();
         } else {
             int variation = random.nextInt(100);
-            if (variation >= 10){
+            if (variation >= mistakeProbability){
                 move = findBestMove();}
             else{
                 bestMove = findBestMove();

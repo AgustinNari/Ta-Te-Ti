@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +22,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_NAME = "extra_name";
     public static final String EXTRA_SYMBOL = "extra_symbol";
     public static final String EXTRA_DIFFICULTY = "extra_difficulty";
+
+    private SeekBar seekMistake;
+    private TextView tvMistakeLabel;
+
+    public static final String EXTRA_MISTAKE_PROB = "extra_mistake_prob";
 
     public static final int DIFFICULTY_EASY = 0;
     public static final int DIFFICULTY_HARD = 1;
@@ -36,6 +43,38 @@ public class MainActivity extends AppCompatActivity {
 
         setupToggleableRadioGroup(rgSymbol, R.id.rbCross, R.id.rbCircle);
         setupToggleableRadioGroup(rgDifficulty, R.id.rbEasy, R.id.rbHard);
+
+        seekMistake = findViewById(R.id.seekMistake);
+        tvMistakeLabel = findViewById(R.id.tvMistakeLabel);
+
+        // default 25%
+        seekMistake.setProgress(24);
+        tvMistakeLabel.setText("Probabilidad de fallo de la máquina: 25%");
+
+        seekMistake.setEnabled(false);
+        tvMistakeLabel.setAlpha(0.5f);
+
+
+        rgDifficulty.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.rbHard) {
+                seekMistake.setEnabled(true);
+                tvMistakeLabel.setAlpha(1f);
+            } else {
+                seekMistake.setEnabled(false);
+                tvMistakeLabel.setAlpha(0.5f);
+            }
+        });
+
+        seekMistake.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int value = progress + 1;
+                tvMistakeLabel.setText("Probabilidad de fallo de la máquina: " + value + "%");
+            }
+
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
         btnStart.setOnClickListener(v -> startGame());
     }
@@ -78,10 +117,18 @@ public class MainActivity extends AppCompatActivity {
             difficulty = DIFFICULTY_HARD;
         }
 
+        int mistakeProb = 25;
+        if (difficulty == DIFFICULTY_HARD) {
+            mistakeProb = seekMistake.getProgress() + 1;
+        }
+
+
+
         Intent intent = new Intent(MainActivity.this, GameActivity.class);
         intent.putExtra(EXTRA_NAME, name);
         intent.putExtra(EXTRA_SYMBOL, String.valueOf(playerSymbol));
         intent.putExtra(EXTRA_DIFFICULTY, difficulty);
+        intent.putExtra(EXTRA_MISTAKE_PROB, mistakeProb);
         startActivity(intent);
     }
 }
